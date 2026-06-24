@@ -1,3 +1,5 @@
+import { z } from "zod";
+import { criarSimulacao, getSimulacoesByUserId, deletarSimulacao } from "./db";
 import { COOKIE_NAME } from "../shared/const.js";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
@@ -23,6 +25,92 @@ export const appRouter = router({
   //     db.getUserTodos(ctx.user.id)
   //   ),
   // }),
-});
+financiamento: router({
+  listarBancos: publicProcedure.query(() => {
+    return [
+      { nome: "Banco do Brasil", taxaMensal: 1.49 },
+      { nome: "Bradesco", taxaMensal: 1.59 },
+      { nome: "Itaú", taxaMensal: 1.69 },
+      { nome: "Santander", taxaMensal: 1.79 },
+      { nome: "Caixa Econômica", taxaMensal: 1.39 },
+      { nome: "BV Financeira", taxaMensal: 1.89 },
+      { nome: "Sicredi", taxaMensal: 1.44 },
+      { nome: "Banrisul", taxaMensal: 1.54 },
+    ];
+  }),
+
+  simular: publicProcedure
+    .input(z.object({
+      valorVeiculo: z.number(),
+      valorEntrada: z.number(),
+      numeroParcelas: z.number(),
+      banco: z.string(),
+    }))
+    .query(({ input }) => {
+      const bancos: Record<string, number> = {
+        "Banco do Brasil": 1.49, "Bradesco": 1.59, "Itaú": 1.69,
+        "Santander": 1.79, "Caixa Econômica": 1.39, "BV Financeira": 1.89,
+        "Sicredi": 1.44, "Banrisul": 1.54,
+      };
+      const taxa = (bancos[input.banco] ?? 1.99) / 100;
+      const valorFinanciado = input.valorVeiculo - input.valorEntrada;
+      const parcela = valorFinanciado * (taxa * Math.pow(1 + taxa, input.numeroParcelas)) / (Math.pow(1 + taxa, input.numeroParcelas) - 1);
+      return {
+        banco: input.banco,
+        taxaMensal: bancos[input.banco],
+        valorParcela: Math.round(parcela * 100) / 100,
+        valorTotalFinanciado: valorFinanciado,
+        valorTotalPago: Math.round(parcela * input.numeroParcelas * 100) / 100,
+      };
+    }),
+
+  salvar: publicProcedure
+    .input(z.object({
+      valorVeiculo: z.number(), valorEntrada: z.number(),
+      numeroParcelas: z.number(), banco: z.string(),
+      anoVeiculo: z.number(), marcaVeiculo: z.string(), modeloVeiculo: z.string(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      if (!ctx.user) throw new Error("Não autenticado");
+      const bancos: Record<string, number> = {
+        "Banco do Brasil": 149, "Bradesco": 159, "Itaú": 169,
+        "Santander": 179, "Caixa Econômica": 139, "BV Financeira": 189,
+        "Sicredi": 144, "Banrisul": 154,
+      };
+      const taxaBasisPoints = bancos[input.banco] ?? 199;
+      const taxa = taxaBasisPoints / 10000;
+      const valorFinanciado = Math.round((input.valorVeiculo - input.valorEntrada) * 100);
+      const parcela = Math.round(valorFinanciado * (taxa * Math.pow(1 + taxa, input.numeroParcelas)) / (Math.pow(1 + taxa, input.numeroParcelas) - 1));
+      await criarSimulacao({
+        userId: ctx.user.id,
+        valorVeiculo: Math.round(input.valorVeiculo * 100),
+        valorEntrada: Math.round(input.valorEntrada * 100),
+        numeroParcelas: input.numeroParcelas,
+        banco: input.banco,
+        taxaJurosMensal: taxaBasisPoints,
+        anoVeiculo: input.anoVeiculo,
+        marcaVeiculo: input.marcaVeiculo,
+        modeloVeiculo: input.modeloVeiculo,
+        valorParcela: parcela,
+        valorTotalFinanciado: valorFinanciado,
+        valorTotalPago: parcela * input.numeroParcelas,
+      });
+      return { success: true };
+    }),
+
+  listar: publicProcedure.query(async ({ ctx }) => {
+    if (!ctx.user) return [];
+    const sims = await getSimulacoesByUserId(ctx.user.id);
+    return sims.map(s => ({ ...s, valorVeiculo: s.valorVeiculo / 100, valorEntrada: s.valorEntrada / 100, valorParcela: s.valorParcela / 100, valorTotalPago: s.valorTotalPago / 100 }));
+  }),
+
+  deletar: publicProcedure
+    .input(z.object({ id: z.number() }))
+    .mutation(async ({ input, ctx }) => {
+      if (!ctx.user) throw new Error("Não autenticado");
+      await deletarSimulacao(input.id);
+      return { success: true };
+    }),
+}),});
 
 export type AppRouter = typeof appRouter;

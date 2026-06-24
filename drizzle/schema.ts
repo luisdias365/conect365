@@ -26,3 +26,22 @@ export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
 // TODO: Add your tables here
+export const simulacoes = mysqlTable("simulacoes", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  valorVeiculo: int("valorVeiculo").notNull(),
+  anoVeiculo: int("anoVeiculo").notNull(),
+  marcaVeiculo: varchar("marcaVeiculo", { length: 100 }).notNull(),
+  modeloVeiculo: varchar("modeloVeiculo", { length: 100 }).notNull(),
+  banco: varchar("banco", { length: 100 }).notNull(),
+  valorEntrada: int("valorEntrada").notNull(),
+  numeroParcelas: int("numeroParcelas").notNull(),
+  taxaJurosMensal: int("taxaJurosMensal").notNull(),
+  valorParcela: int("valorParcela").notNull(),
+  valorTotalFinanciado: int("valorTotalFinanciado").notNull(),
+  valorTotalPago: int("valorTotalPago").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type Simulacao = typeof simulacoes.$inferSelect;
+export type InsertSimulacao = typeof simulacoes.$inferInsert;

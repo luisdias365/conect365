@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertUser, users, simulacoes, InsertSimulacao } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -90,3 +90,20 @@ export async function getUserByOpenId(openId: string) {
 }
 
 // TODO: add feature queries here as your schema grows.
+export async function criarSimulacao(dados: InsertSimulacao): Promise<void> {
+  const db = await getDb();
+  if (!db) { console.warn("[Database] Cannot create simulacao"); return; }
+  await db.insert(simulacoes).values(dados);
+}
+
+export async function getSimulacoesByUserId(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(simulacoes).where(eq(simulacoes.userId, userId)).orderBy(simulacoes.createdAt);
+}
+
+export async function deletarSimulacao(id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+  await db.delete(simulacoes).where(eq(simulacoes.id, id));
+}
