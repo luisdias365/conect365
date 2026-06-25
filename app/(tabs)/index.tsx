@@ -33,7 +33,6 @@ export default function HomeScreen() {
   const [error, setError] = useState('');
   const [perfilCredito, setPerfilCredito] = useState('');
   const [taxaRetorno, setTaxaRetorno] = useState('');
-  const [taxaRetorno, setTaxaRetorno] = useState('');
 
   useEffect(() => {
     const timer = setTimeout(() => setShowSplash(false), 2500);
