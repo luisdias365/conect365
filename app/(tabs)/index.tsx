@@ -195,9 +195,9 @@ const calcularAjusteTaxa = (): number => {
       };
       await addToHistory(simulation);
       router.push({
-        pathname: '/results',
-        params: { simulationId: simulation.id },
-      });
+    pathname: '/results',
+    params: { simulationData: JSON.stringify(simulation) },
+});
     } catch (err) {
       setError('Erro ao simular. Tente novamente.');
       console.error(err);
