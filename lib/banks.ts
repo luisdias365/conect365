@@ -6,94 +6,64 @@ import { Bank, BankResult, SimulationInput, AmortizationEntry } from './types';
  */
 export const BANKS: Bank[] = [
   {
-    id: 'bb',
-    name: 'Banco do Brasil',
-    monthlyRate: 1.45,
-    color: '#FFD700', // Amarelo
-  },
-  {
-    id: 'caixa',
-    name: 'Caixa Econômica',
-    monthlyRate: 1.38,
-    color: '#0066CC', // Azul
-  },
-  {
-    id: 'bradesco',
-    name: 'Bradesco',
-    monthlyRate: 1.52,
-    color: '#C41E3A', // Vermelho
-  },
-  {
-    id: 'itau',
-    name: 'Itaú',
-    monthlyRate: 1.48,
-    color: '#EC7000', // Laranja
+    id: 'bv',
+    name: 'BV Financeira',
+    monthlyRate: 1.14,
+    color: '#FF6B00',
   },
   {
     id: 'santander',
     name: 'Santander',
-    monthlyRate: 1.55,
-    color: '#FF0000', // Vermelho
+    monthlyRate: 1.59,
+    color: '#EC0000',
   },
   {
-    id: 'nubank',
-    name: 'Nubank',
-    monthlyRate: 1.99,
-    color: '#7C3AED', // Roxo
+    id: 'volkswagen',
+    name: 'Banco Volkswagen',
+    monthlyRate: 1.62,
+    color: '#001E50',
   },
   {
-    id: 'inter',
-    name: 'Banco Inter',
-    monthlyRate: 1.42,
-    color: '#FF6B35', // Laranja avermelhado
+    id: 'bradesco',
+    name: 'Bradesco',
+    monthlyRate: 1.65,
+    color: '#C41F3A',
+  },
+  {
+    id: 'bb',
+    name: 'Banco do Brasil',
+    monthlyRate: 1.82,
+    color: '#FFD700',
+  },
+  {
+    id: 'itau',
+    name: 'Itaú',
+    monthlyRate: 1.74,
+    color: '#EC7000',
+  },
+  {
+    id: 'caixa',
+    name: 'Caixa Econômica',
+    monthlyRate: 1.80,
+    color: '#0066CC',
   },
   {
     id: 'sicredi',
     name: 'Sicredi',
-    monthlyRate: 1.35,
-    color: '#00A651', // Verde
-  },
-  {
-    id: 'bv',
-    name: 'BV Financeira',
-    monthlyRate: 1.58,
-    color: '#1E90FF', // Azul Royal
+    monthlyRate: 1.85,
+    color: '#009A44',
   },
   {
     id: 'pan',
     name: 'Banco Pan',
-    monthlyRate: 1.62,
-    color: '#FF8C00', // Laranja escuro
-  },
-  {
-    id: 'c6',
-    name: 'Banco C6',
-    monthlyRate: 1.41,
-    color: '#2E8B57', // Verde escuro
-  },
-  {
-    id: 'safra',
-    name: 'Banco Safra',
-    monthlyRate: 1.50,
-    color: '#DC143C', // Vermelho carmesim
-  },
-  {
-    id: 'daycoval',
-    name: 'Banco Daycoval',
-    monthlyRate: 1.65,
-    color: '#4169E1', // Azul royal
+    monthlyRate: 2.20,
+    color: '#FF6B35',
   },
   {
     id: 'omni',
-    name: 'Banco Omni',
-    monthlyRate: 1.60,
-    color: '#FF1493', // Rosa profundo
-  },
-  {
-    id: 'carbank',
-    name: 'Banco Carbank',
-    monthlyRate: 1.68,
-    color: '#FFB6C1', // Rosa claro
+    name: 'Omni',
+    monthlyRate: 2.90,
+    color: '#8B0000',
   },
 ];
 

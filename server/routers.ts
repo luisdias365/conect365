@@ -28,14 +28,16 @@ export const appRouter = router({
 financiamento: router({
   listarBancos: publicProcedure.query(() => {
     return [
-      { nome: "Banco do Brasil", taxaMensal: 1.49 },
-      { nome: "Bradesco", taxaMensal: 1.59 },
-      { nome: "Itaú", taxaMensal: 1.69 },
-      { nome: "Santander", taxaMensal: 1.79 },
-      { nome: "Caixa Econômica", taxaMensal: 1.39 },
-      { nome: "BV Financeira", taxaMensal: 1.89 },
-      { nome: "Sicredi", taxaMensal: 1.44 },
-      { nome: "Banrisul", taxaMensal: 1.54 },
+      { nome: "BV Financeira",    taxaMensal: 1.14 },
+{ nome: "Santander",        taxaMensal: 1.59 },
+{ nome: "Banco Volkswagen", taxaMensal: 1.62 },
+{ nome: "Bradesco",         taxaMensal: 1.65 },
+{ nome: "Banco do Brasil",  taxaMensal: 1.82 },
+{ nome: "Itaú",             taxaMensal: 1.74 },
+{ nome: "Caixa Econômica",  taxaMensal: 1.80 },
+{ nome: "Sicredi",          taxaMensal: 1.85 },
+{ nome: "Pan",              taxaMensal: 2.20 },
+{ nome: "Omni",             taxaMensal: 2.90 },
     ];
   }),
 

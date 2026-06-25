@@ -20,6 +20,9 @@ export default function HomeScreen() {
   const [dataNascimento, setDataNascimento] = useState('');
 
   // Dados do veículo
+  const [placa, setPlaca] = useState('');
+  const [entradaSugerida, setEntradaSugerida] = useState('');
+  const [perfilDetalhado, setPerfilDetalhado] = useState('');
   const [marca, setMarca] = useState('');
   const [modelo, setModelo] = useState('');
   const [ano, setAno] = useState('');
@@ -55,27 +58,48 @@ export default function HomeScreen() {
 
   // Formatar data de nascimento
   const handleDataNascimentoChange = (text: string) => {
-    const cleaned = text.replace(/\D/g, '');
-    let formatted = cleaned;
-    if (cleaned.length > 2) formatted = cleaned.slice(0, 2) + '/' + cleaned.slice(2);
-    if (cleaned.length > 4) formatted = cleaned.slice(0, 2) + '/' + cleaned.slice(2, 4) + '/' + cleaned.slice(4, 8);
-    setDataNascimento(formatted);
+  const cleaned = text.replace(/\D/g, '');
+  let formatted = cleaned;
+  if (cleaned.length > 2) formatted = cleaned.slice(0, 2) + '/' + cleaned.slice(2);
+  if (cleaned.length > 4) formatted = cleaned.slice(0, 2) + '/' + cleaned.slice(2, 4) + '/' + cleaned.slice(4, 8);
+  setDataNascimento(formatted);
 
-    if (cleaned.length === 8) {
-      const dia = parseInt(cleaned.slice(0, 2));
-      const mes = parseInt(cleaned.slice(2, 4)) - 1;
-      const anoNasc = parseInt(cleaned.slice(4, 8));
-      const hoje = new Date();
-      const nascimento = new Date(anoNasc, mes, dia);
-      const idade = hoje.getFullYear() - nascimento.getFullYear();
+  if (cleaned.length === 8) {
+    const dia = parseInt(cleaned.slice(0, 2));
+    const mes = parseInt(cleaned.slice(2, 4)) - 1;
+    const anoNasc = parseInt(cleaned.slice(4, 8));
+    const hoje = new Date();
+    const nascimento = new Date(anoNasc, mes, dia);
+    const idade = hoje.getFullYear() - nascimento.getFullYear();
 
-      if (idade < 18) setPerfilCredito('❌ Menor de idade');
-      else if (idade < 25) setPerfilCredito('🟡 Jovem - Taxa +0.3%');
-      else if (idade < 60) setPerfilCredito('🟢 Adulto - Taxa padrão');
-      else setPerfilCredito('🟡 Sênior - Taxa +0.2%');
+    if (idade < 18) {
+      setPerfilCredito('❌ Menor de idade');
+      setPerfilDetalhado('');
+      setEntradaSugerida('');
+    } else if (idade < 25) {
+      setPerfilCredito('🟡 Jovem - Taxa +0.3%');
+      setPerfilDetalhado('Entrada sugerida: 30% | Bancos recomendados: Caixa, Banco do Brasil');
+      if (valorFipe) setEntradaSugerida(String(Math.round(parseFloat(valorFipe) * 0.30)));
+    } else if (idade < 60) {
+      setPerfilCredito('🟢 Adulto - Taxa padrão');
+      setPerfilDetalhado('Entrada sugerida: 20% | Bancos recomendados: Itaú, Bradesco, Santander');
+      if (valorFipe) setEntradaSugerida(String(Math.round(parseFloat(valorFipe) * 0.20)));
+    } else {
+      setPerfilCredito('🟡 Sênior - Taxa +0.2%');
+      setPerfilDetalhado('Entrada sugerida: 25% | Bancos recomendados: Caixa, Sicredi');
+      if (valorFipe) setEntradaSugerida(String(Math.round(parseFloat(valorFipe) * 0.25)));
     }
-    setError('');
-  };
+  }
+  setError('');
+};
+
+const handlePlacaChange = (text: string) => {
+  const cleaned = text.toUpperCase().replace(/[^A-Z0-9]/g, '');
+  let formatted = cleaned;
+  if (cleaned.length > 3) formatted = cleaned.slice(0, 3) + '-' + cleaned.slice(3, 7);
+  setPlaca(formatted);
+  setError('');
+};
 
   const handleAnoChange = (text: string) => {
     const cleaned = text.replace(/\D/g, '').slice(0, 4);
@@ -254,37 +278,119 @@ return (
             </View>
 
             {/* SEÇÃO: Dados do Veículo */}
-            <View>
-              <Text className="text-lg font-bold text-foreground mb-3">🚗 Dados do Veículo</Text>
-              <View className="flex-row gap-3 mb-4">
-                <View className="flex-1">
-                  <Text className="text-sm font-semibold text-foreground mb-2">Marca</Text>
-                  <View className="bg-surface rounded-lg border border-border p-4">
-                    <TextInput value={marca} onChangeText={(t) => { setMarca(t); setError(''); }} placeholder="Ex: Toyota" placeholderTextColor="#9BA1A6" className="text-base font-bold text-foreground" editable={!isLoading} />
-                  </View>
-                </View>
-                <View className="flex-1">
-                  <Text className="text-sm font-semibold text-foreground mb-2">Modelo</Text>
-                  <View className="bg-surface rounded-lg border border-border p-4">
-                    <TextInput value={modelo} onChangeText={(t) => { setModelo(t); setError(''); }} placeholder="Ex: Corolla" placeholderTextColor="#9BA1A6" className="text-base font-bold text-foreground" editable={!isLoading} />
-                  </View>
-                </View>
-              </View>
-              <View className="flex-row gap-3">
-                <View className="flex-1">
-                  <Text className="text-sm font-semibold text-foreground mb-2">Ano</Text>
-                  <View className="bg-surface rounded-lg border border-border p-4">
-                    <TextInput value={ano} onChangeText={handleAnoChange} placeholder="2020" placeholderTextColor="#9BA1A6" keyboardType="number-pad" className="text-base font-bold text-foreground" maxLength={4} editable={!isLoading} />
-                  </View>
-                </View>
-                <View className="flex-1">
-                  <Text className="text-sm font-semibold text-foreground mb-2">Valor FIPE (R$)</Text>
-                  <View className="bg-surface rounded-lg border border-border p-4">
-                    <TextInput value={valorFipe} onChangeText={handleValorFipeChange} placeholder="0" placeholderTextColor="#9BA1A6" keyboardType="number-pad" className="text-base font-bold text-foreground" editable={!isLoading} />
-                  </View>
-                </View>
-              </View>
-            </View>
+            {/* SEÇÃO: Dados do Veículo */}
+<View>
+  <Text className="text-lg font-bold text-foreground mb-3">🚗 Dados do Veículo</Text>
+
+  {/* Placa */}
+  <View className="mb-4">
+    <Text className="text-sm font-semibold text-foreground mb-2">Placa</Text>
+    <View className="bg-surface rounded-lg border border-border p-4">
+      <TextInput
+        value={placa}
+        onChangeText={handlePlacaChange}
+        placeholder="ABC-1234 ou ABC1D23"
+        placeholderTextColor="#9BA1A6"
+        className="text-xl font-bold text-foreground"
+        maxLength={8}
+        autoCapitalize="characters"
+        editable={!isLoading}
+      />
+    </View>
+    <Text className="text-xs text-muted mt-2">Digite a placa para identificar o veículo</Text>
+  </View>
+
+  {/* Marca e Modelo */}
+  <View className="flex-row gap-3 mb-4">
+    <View className="flex-1">
+      <Text className="text-sm font-semibold text-foreground mb-2">Marca</Text>
+      <View className="bg-surface rounded-lg border border-border p-4">
+        <TextInput
+          value={marca}
+          onChangeText={(t) => { setMarca(t); setError(''); }}
+          placeholder="Ex: Toyota"
+          placeholderTextColor="#9BA1A6"
+          className="text-base font-bold text-foreground"
+          editable={!isLoading}
+        />
+      </View>
+    </View>
+    <View className="flex-1">
+      <Text className="text-sm font-semibold text-foreground mb-2">Modelo</Text>
+      <View className="bg-surface rounded-lg border border-border p-4">
+        <TextInput
+          value={modelo}
+          onChangeText={(t) => { setModelo(t); setError(''); }}
+          placeholder="Ex: Corolla"
+          placeholderTextColor="#9BA1A6"
+          className="text-base font-bold text-foreground"
+          editable={!isLoading}
+        />
+      </View>
+    </View>
+  </View>
+
+  {/* Ano e Valor FIPE */}
+  <View className="flex-row gap-3">
+    <View className="flex-1">
+      <Text className="text-sm font-semibold text-foreground mb-2">Ano</Text>
+      <View className="bg-surface rounded-lg border border-border p-4">
+        <TextInput
+          value={ano}
+          onChangeText={handleAnoChange}
+          placeholder="2020"
+          placeholderTextColor="#9BA1A6"
+          keyboardType="number-pad"
+          className="text-base font-bold text-foreground"
+          maxLength={4}
+          editable={!isLoading}
+        />
+      </View>
+    </View>
+    <View className="flex-1">
+      <Text className="text-sm font-semibold text-foreground mb-2">Valor FIPE (R$)</Text>
+      <View className="bg-surface rounded-lg border border-border p-4">
+        <TextInput
+          value={valorFipe}
+          onChangeText={handleValorFipeChange}
+          placeholder="0"
+          placeholderTextColor="#9BA1A6"
+          keyboardType="number-pad"
+          className="text-base font-bold text-foreground"
+          editable={!isLoading}
+        />
+      </View>
+    </View>
+  </View>
+
+  {/* Taxa de Retorno */}
+  <View className="mt-4">
+    <Text className="text-sm font-semibold text-foreground mb-2">Taxa de Retorno da Loja (%)</Text>
+    <View className="bg-surface rounded-lg border border-border p-4">
+      <TextInput
+        value={taxaRetorno}
+        onChangeText={handleTaxaRetornoChange}
+        placeholder="Ex: 2.5"
+        placeholderTextColor="#9BA1A6"
+        keyboardType="decimal-pad"
+        className="text-base font-bold text-foreground"
+        editable={!isLoading}
+      />
+    </View>
+    <Text className="text-xs text-muted mt-2">Percentual que a loja adiciona sobre o valor FIPE</Text>
+  </View>
+
+  {/* Entrada Sugerida */}
+  {entradaSugerida ? (
+    <View className="mt-4 bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-lg p-3">
+      <Text className="text-sm font-bold text-blue-700 dark:text-blue-200 mb-1">💡 Entrada Sugerida para seu Perfil</Text>
+      <Text className="text-lg font-bold text-blue-800 dark:text-blue-100">
+        R$ {parseFloat(entradaSugerida).toLocaleString('pt-BR')}
+      </Text>
+      <Text className="text-xs text-blue-600 dark:text-blue-300 mt-1">{perfilDetalhado}</Text>
+    </View>
+  ) : null}
+</View>
 
             {/* Taxa de Retorno */}
               <View className="mt-4">
