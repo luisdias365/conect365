@@ -103,17 +103,6 @@ const handleTaxaRetornoChange = (text: string) => {
   setError('');
 };
 
-const handleTaxaRetornoChange = (text: string) => {
-  const cleaned = text.replace(/[^0-9.]/g, '');
-  setTaxaRetorno(cleaned);
-  if (valorFipe) {
-    const retorno = parseFloat(cleaned) || 0;
-    const valorComRetorno = Math.round(parseFloat(valorFipe) * (1 + retorno / 100));
-    setAmount(String(valorComRetorno));
-  }
-  setError('');
-};
-
   const handleAmountChange = (text: string) => {
     const cleaned = text.replace(/\D/g, '');
     setAmount(cleaned);
