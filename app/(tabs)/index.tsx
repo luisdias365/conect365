@@ -32,6 +32,8 @@ export default function HomeScreen() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [perfilCredito, setPerfilCredito] = useState('');
+  const [taxaRetorno, setTaxaRetorno] = useState('');
+  const [taxaRetorno, setTaxaRetorno] = useState('');
 
   useEffect(() => {
     const timer = setTimeout(() => setShowSplash(false), 2500);
@@ -83,11 +85,35 @@ export default function HomeScreen() {
   };
 
   const handleValorFipeChange = (text: string) => {
-    const cleaned = text.replace(/\D/g, '');
-    setValorFipe(cleaned);
-    setAmount(cleaned);
-    setError('');
-  };
+  const cleaned = text.replace(/\D/g, '');
+  setValorFipe(cleaned);
+  const retorno = parseFloat(taxaRetorno) || 0;
+  const valorComRetorno = Math.round(parseFloat(cleaned) * (1 + retorno / 100));
+  setAmount(String(valorComRetorno));
+  setError('');
+};
+
+const handleTaxaRetornoChange = (text: string) => {
+  const cleaned = text.replace(/[^0-9.]/g, '');
+  setTaxaRetorno(cleaned);
+  if (valorFipe) {
+    const retorno = parseFloat(cleaned) || 0;
+    const valorComRetorno = Math.round(parseFloat(valorFipe) * (1 + retorno / 100));
+    setAmount(String(valorComRetorno));
+  }
+  setError('');
+};
+
+const handleTaxaRetornoChange = (text: string) => {
+  const cleaned = text.replace(/[^0-9.]/g, '');
+  setTaxaRetorno(cleaned);
+  if (valorFipe) {
+    const retorno = parseFloat(cleaned) || 0;
+    const valorComRetorno = Math.round(parseFloat(valorFipe) * (1 + retorno / 100));
+    setAmount(String(valorComRetorno));
+  }
+  setError('');
+};
 
   const handleAmountChange = (text: string) => {
     const cleaned = text.replace(/\D/g, '');
@@ -272,7 +298,24 @@ return (
               </View>
             </View>
 
-            {/* SEÇÃO: Financiamento */}
+            {/* Taxa de Retorno */}
+              <View className="mt-4">
+                <Text className="text-sm font-semibold text-foreground mb-2">Taxa de Retorno da Loja (%)</Text>
+                <View className="bg-surface rounded-lg border border-border p-4">
+                  <TextInput
+                    value={taxaRetorno}
+                    onChangeText={handleTaxaRetornoChange}
+                    placeholder="Ex: 2.5"
+                    placeholderTextColor="#9BA1A6"
+                    keyboardType="decimal-pad"
+                    className="text-base font-bold text-foreground"
+                    editable={!isLoading}
+                  />
+                </View>
+                <Text className="text-xs text-muted mt-2">Percentual que a loja adiciona sobre o valor FIPE</Text>
+              </View>
+
+           {/* SEÇÃO: Financiamento */}
             <View>
               <Text className="text-lg font-bold text-foreground mb-3">💰 Financiamento</Text>
               <View className="mb-4">
