@@ -6,10 +6,7 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal",
-      "env": {
-        "EAS_NO_VCS": "1"
-      }
+      "distribution": "internal"
     },
     "preview": {
       "distribution": "internal",
@@ -17,7 +14,8 @@
         "buildType": "apk"
       },
       "env": {
-        "EAS_NO_VCS": "1"
+        "NODE_ENV": "production",
+        "EXPO_PUBLIC_ENV": "preview"
       }
     },
     "production": {
