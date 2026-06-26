@@ -126,7 +126,7 @@ const config: ExpoConfig = {
   },
   extra: {
     eas: {
-      projectId: env.appSlug,
+      projectId: "e355d169-8e95-4a8f-91ea-25ff3239b08d",
     },
   },
 };
