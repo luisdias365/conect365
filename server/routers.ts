@@ -38,6 +38,8 @@ financiamento: router({
 { nome: "Sicredi",          taxaMensal: 1.85 },
 { nome: "Pan",              taxaMensal: 2.20 },
 { nome: "Omni",             taxaMensal: 2.90 },
+{ nome: "C6 Bank", taxaMensal: 1.38 },
+{ nome: "Banco Safra", taxaMensal: 1.45 },
     ];
   }),
 

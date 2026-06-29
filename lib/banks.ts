@@ -65,6 +65,18 @@ export const BANKS: Bank[] = [
     monthlyRate: 2.90,
     color: '#8B0000',
   },
+{
+    id: 'c6',
+    name: 'C6 Bank',
+    monthlyRate: 1.38,
+    color: '#000000',
+  },
+  {
+    id: 'safra',
+    name: 'Banco Safra',
+    monthlyRate: 1.45,
+    color: '#1B3A6B',
+  },
 ];
 
 /**
