@@ -247,6 +247,11 @@ return (
                   <MaterialIcons name="settings" size={24} color={colors.foreground} />
                 </View>
               </Pressable>
+              <Pressable onPress={() => router.push('/admin')} style={({ pressed }) => [{ opacity: pressed ? 0.7 : 1 }]}>
+  <View className="bg-surface rounded-full p-3 border border-border">
+    <MaterialIcons name="admin-panel-settings" size={24} color={colors.foreground} />
+  </View>
+</Pressable>
             </View>
           </View>
 
