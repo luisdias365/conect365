@@ -1,11 +1,18 @@
-import { ScrollView, Text, View, TextInput, Pressable, Alert } from 'react-native';
-import { useState } from 'react';
+import { ScrollView, Text, View, TextInput, Pressable, Alert, ActivityIndicator } from 'react-native';
+import { useState, useEffect } from 'react';
 import { ScreenContainer } from '@/components/screen-container';
 import { useColors } from '@/hooks/use-colors';
 import { MaterialIcons } from '@expo/vector-icons';
+import { api } from '@/lib/api';
 
 const ADMIN_USER = 'admin';
 const ADMIN_PASS = 'conect365';
+
+type Banco = {
+  id: string;
+  nome: string;
+  taxa: string;
+};
 
 export default function AdminScreen() {
   const colors = useColors();
@@ -13,24 +20,40 @@ export default function AdminScreen() {
   const [usuario, setUsuario] = useState('');
   const [senha, setSenha] = useState('');
   const [erroLogin, setErroLogin] = useState('');
-
-  const [bancos, setBancos] = useState([
-    { id: 'bv', nome: 'BV Financeira', taxa: '1.14' },
-    { id: 'santander', nome: 'Santander', taxa: '1.29' },
-    { id: 'volkswagen', nome: 'Banco Volkswagen', taxa: '1.52' },
-    { id: 'bradesco', nome: 'Bradesco', taxa: '1.55' },
-    { id: 'bb', nome: 'Banco do Brasil', taxa: '1.62' },
-    { id: 'itau', nome: 'Itaú', taxa: '1.74' },
-    { id: 'caixa', nome: 'Caixa Econômica', taxa: '1.80' },
-    { id: 'sicredi', nome: 'Sicredi', taxa: '1.85' },
-    { id: 'pan', nome: 'Banco Pan', taxa: '2.10' },
-    { id: 'omni', nome: 'Omni', taxa: '2.90' },
-    { id: 'c6', nome: 'C6 Bank', taxa: '1.38' },
-    { id: 'safra', nome: 'Banco Safra', taxa: '1.45' },
-  ]);
-
+  const [bancos, setBancos] = useState<Banco[]>([]);
+  const [carregando, setCarregando] = useState(false);
+  const [salvando, setSalvando] = useState(false);
   const [novoNome, setNovoNome] = useState('');
   const [novaTaxa, setNovaTaxa] = useState('');
+
+  const carregarBancos = async () => {
+    setCarregando(true);
+    try {
+      const lista = await api.bancos.listar.query();
+      setBancos(lista.map(b => ({ id: b.id, nome: b.nome, taxa: String(b.taxaMensal) })));
+    } catch (err) {
+      setBancos([
+        { id: 'bv', nome: 'BV Financeira', taxa: '1.14' },
+        { id: 'santander', nome: 'Santander', taxa: '1.29' },
+        { id: 'volkswagen', nome: 'Banco Volkswagen', taxa: '1.52' },
+        { id: 'bradesco', nome: 'Bradesco', taxa: '1.55' },
+        { id: 'bb', nome: 'Banco do Brasil', taxa: '1.62' },
+        { id: 'itau', nome: 'Itaú', taxa: '1.74' },
+        { id: 'caixa', nome: 'Caixa Econômica', taxa: '1.80' },
+        { id: 'sicredi', nome: 'Sicredi', taxa: '1.85' },
+        { id: 'pan', nome: 'Banco Pan', taxa: '2.10' },
+        { id: 'omni', nome: 'Omni', taxa: '2.90' },
+        { id: 'c6', nome: 'C6 Bank', taxa: '1.38' },
+        { id: 'safra', nome: 'Banco Safra', taxa: '1.45' },
+      ]);
+    } finally {
+      setCarregando(false);
+    }
+  };
+
+  useEffect(() => {
+    if (logado) carregarBancos();
+  }, [logado]);
 
   const handleLogin = () => {
     if (usuario === ADMIN_USER && senha === ADMIN_PASS) {
@@ -45,20 +68,41 @@ export default function AdminScreen() {
     setBancos(prev => prev.map(b => b.id === id ? { ...b, taxa: novaTaxa } : b));
   };
 
-  const handleAdicionarBanco = () => {
+  const handleSalvar = async () => {
+    setSalvando(true);
+    try {
+      for (const banco of bancos) {
+        await api.bancos.salvar.mutate({
+          id: banco.id,
+          nome: banco.nome,
+          taxa: parseFloat(banco.taxa),
+        });
+      }
+      Alert.alert('Salvo!', 'As taxas foram atualizadas com sucesso!');
+    } catch (err) {
+      Alert.alert('Erro', 'Não foi possível salvar. Verifique a conexão.');
+    } finally {
+      setSalvando(false);
+    }
+  };
+
+  const handleAdicionarBanco = async () => {
     if (!novoNome.trim() || !novaTaxa.trim()) {
       Alert.alert('Erro', 'Preencha o nome e a taxa do banco');
       return;
     }
-    const novoId = novoNome.toLowerCase().replace(/\s/g, '_');
-    setBancos(prev => [...prev, { id: novoId, nome: novoNome, taxa: novaTaxa }]);
-    setNovoNome('');
-    setNovaTaxa('');
-    Alert.alert('Sucesso', `${novoNome} adicionado com sucesso!`);
-  };
-
-  const handleSalvar = () => {
-    Alert.alert('Salvo!', 'As taxas foram atualizadas com sucesso!');
+    try {
+      await api.bancos.adicionarNovo.mutate({
+        nome: novoNome,
+        taxa: parseFloat(novaTaxa),
+      });
+      await carregarBancos();
+      setNovoNome('');
+      setNovaTaxa('');
+      Alert.alert('Sucesso', `${novoNome} adicionado!`);
+    } catch (err) {
+      Alert.alert('Erro', 'Não foi possível adicionar o banco.');
+    }
   };
 if (!logado) {
     return (
@@ -108,6 +152,17 @@ if (!logado) {
               </View>
             </Pressable>
           </View>
+        </View>
+      </ScreenContainer>
+    );
+  }
+
+  if (carregando) {
+    return (
+      <ScreenContainer className="p-4">
+        <View className="flex-1 justify-center items-center">
+          <ActivityIndicator size="large" color="#0066CC" />
+          <Text className="text-base text-muted mt-4">Carregando bancos...</Text>
         </View>
       </ScreenContainer>
     );
@@ -182,9 +237,12 @@ return (
           </Pressable>
         </View>
 
-        <Pressable onPress={handleSalvar} style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}>
-          <View className="bg-primary rounded-lg p-4 items-center mb-8">
-            <Text className="text-lg font-bold text-white">✅ Salvar Alterações</Text>
+        <Pressable onPress={handleSalvar} disabled={salvando} style={({ pressed }) => [{ opacity: pressed || salvando ? 0.8 : 1 }]}>
+          <View className="bg-primary rounded-lg p-4 items-center mb-8 flex-row justify-center gap-2">
+            {salvando && <ActivityIndicator color="#fff" size="small" />}
+            <Text className="text-lg font-bold text-white">
+              {salvando ? 'Salvando...' : '✅ Salvar Alterações'}
+            </Text>
           </View>
         </Pressable>
 
