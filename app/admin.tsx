@@ -16,14 +16,14 @@ export default function AdminScreen() {
 
   const [bancos, setBancos] = useState([
     { id: 'bv', nome: 'BV Financeira', taxa: '1.14' },
-    { id: 'santander', nome: 'Santander', taxa: '1.59' },
-    { id: 'volkswagen', nome: 'Banco Volkswagen', taxa: '1.62' },
-    { id: 'bradesco', nome: 'Bradesco', taxa: '1.65' },
-    { id: 'bb', nome: 'Banco do Brasil', taxa: '1.82' },
+    { id: 'santander', nome: 'Santander', taxa: '1.29' },
+    { id: 'volkswagen', nome: 'Banco Volkswagen', taxa: '1.52' },
+    { id: 'bradesco', nome: 'Bradesco', taxa: '1.55' },
+    { id: 'bb', nome: 'Banco do Brasil', taxa: '1.62' },
     { id: 'itau', nome: 'Itaú', taxa: '1.74' },
     { id: 'caixa', nome: 'Caixa Econômica', taxa: '1.80' },
     { id: 'sicredi', nome: 'Sicredi', taxa: '1.85' },
-    { id: 'pan', nome: 'Banco Pan', taxa: '2.20' },
+    { id: 'pan', nome: 'Banco Pan', taxa: '2.10' },
     { id: 'omni', nome: 'Omni', taxa: '2.90' },
     { id: 'c6', nome: 'C6 Bank', taxa: '1.38' },
     { id: 'safra', nome: 'Banco Safra', taxa: '1.45' },
@@ -31,7 +31,8 @@ export default function AdminScreen() {
 
   const [novoNome, setNovoNome] = useState('');
   const [novaTaxa, setNovaTaxa] = useState('');
-const handleLogin = () => {
+
+  const handleLogin = () => {
     if (usuario === ADMIN_USER && senha === ADMIN_PASS) {
       setLogado(true);
       setErroLogin('');
@@ -59,8 +60,7 @@ const handleLogin = () => {
   const handleSalvar = () => {
     Alert.alert('Salvo!', 'As taxas foram atualizadas com sucesso!');
   };
-
-  if (!logado) {
+if (!logado) {
     return (
       <ScreenContainer className="p-6">
         <View className="flex-1 justify-center">
@@ -71,12 +71,51 @@ const handleLogin = () => {
             <View>
               <Text className="text-sm font-semibold text-foreground mb-2">Usuário</Text>
               <View className="bg-surface rounded-lg border border-border p-4">
-                <TextInpu
+                <TextInput
+                  value={usuario}
+                  onChangeText={setUsuario}
+                  placeholder="Digite o usuário"
+                  placeholderTextColor="#9BA1A6"
+                  className="text-base text-foreground"
+                  autoCapitalize="none"
+                />
+              </View>
+            </View>
+
+            <View>
+              <Text className="text-sm font-semibold text-foreground mb-2">Senha</Text>
+              <View className="bg-surface rounded-lg border border-border p-4">
+                <TextInput
+                  value={senha}
+                  onChangeText={setSenha}
+                  placeholder="Digite a senha"
+                  placeholderTextColor="#9BA1A6"
+                  className="text-base text-foreground"
+                  secureTextEntry
+                />
+              </View>
+            </View>
+
+            {erroLogin ? (
+              <View className="bg-red-50 dark:bg-red-900 border border-red-200 rounded-lg p-3">
+                <Text className="text-sm text-red-600">{erroLogin}</Text>
+              </View>
+            ) : null}
+
+            <Pressable onPress={handleLogin} style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}>
+              <View className="bg-primary rounded-lg p-4 items-center">
+                <Text className="text-lg font-bold text-white">Entrar</Text>
+              </View>
+            </Pressable>
+          </View>
+        </View>
+      </ScreenContainer>
+    );
+  }
 return (
     <ScreenContainer className="p-4">
       <ScrollView showsVerticalScrollIndicator={false}>
 
-        {/* Header */}
         <View className="flex-row items-center justify-between mb-6">
           <View>
             <Text className="text-3xl font-bold text-foreground">Admin</Text>
@@ -89,7 +128,6 @@ return (
           </Pressable>
         </View>
 
-        {/* Lista de Bancos */}
         <Text className="text-lg font-bold text-foreground mb-3">🏦 Bancos e Taxas</Text>
         <View className="gap-3 mb-6">
           {bancos.map((banco) => (
@@ -110,7 +148,6 @@ return (
           ))}
         </View>
 
-        {/* Adicionar Novo Banco */}
         <Text className="text-lg font-bold text-foreground mb-3">➕ Adicionar Banco</Text>
         <View className="bg-surface rounded-lg border border-border p-4 mb-6 gap-3">
           <View>
@@ -145,7 +182,6 @@ return (
           </Pressable>
         </View>
 
-        {/* Botão Salvar */}
         <Pressable onPress={handleSalvar} style={({ pressed }) => [{ opacity: pressed ? 0.8 : 1 }]}>
           <View className="bg-primary rounded-lg p-4 items-center mb-8">
             <Text className="text-lg font-bold text-white">✅ Salvar Alterações</Text>
