@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { criarSimulacao, getSimulacoesByUserId, deletarSimulacao } from "./db";
+import { criarSimulacao, getSimulacoesByUserId, deletarSimulacao, getBancos, upsertBanco, inicializarBancos } from "./db";
 import { COOKIE_NAME } from "../shared/const.js";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
@@ -25,6 +25,51 @@ export const appRouter = router({
   //     db.getUserTodos(ctx.user.id)
   //   ),
   // }),
+bancos: router({
+  listar: publicProcedure.query(async () => {
+    const lista = await getBancos();
+    return lista.map(b => ({
+      ...b,
+      taxaMensal: b.taxaMensal / 100,
+    }));
+  }),
+
+  salvar: publicProcedure
+    .input(z.object({
+      id: z.string(),
+      nome: z.string(),
+      taxa: z.number(),
+      cor: z.string().optional(),
+    }))
+    .mutation(async ({ input }) => {
+      await upsertBanco({
+        id: input.id,
+        nome: input.nome,
+        taxaMensal: Math.round(input.taxa * 100),
+        cor: input.cor ?? '#000000',
+        ativo: 1,
+      });
+      return { success: true };
+    }),
+
+  adicionarNovo: publicProcedure
+    .input(z.object({
+      nome: z.string(),
+      taxa: z.number(),
+      cor: z.string().optional(),
+    }))
+    .mutation(async ({ input }) => {
+      const id = input.nome.toLowerCase().replace(/\s/g, '_');
+      await upsertBanco({
+        id,
+        nome: input.nome,
+        taxaMensal: Math.round(input.taxa * 100),
+        cor: input.cor ?? '#000000',
+        ativo: 1,
+      });
+      return { success: true };
+    }),
+}),
 financiamento: router({
   listarBancos: publicProcedure.query(() => {
     return [

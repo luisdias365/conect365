@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, simulacoes, InsertSimulacao } from "../drizzle/schema";
+import { InsertUser, users, simulacoes, InsertSimulacao, bancos, InsertBanco } from "../drizzle/schema";
 import { ENV } from "./_core/env";
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -106,4 +106,43 @@ export async function deletarSimulacao(id: number): Promise<void> {
   const db = await getDb();
   if (!db) return;
   await db.delete(simulacoes).where(eq(simulacoes.id, id));
+}
+export async function getBancos() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(bancos).where(eq(bancos.ativo, 1)).orderBy(bancos.taxaMensal);
+}
+
+export async function upsertBanco(banco: InsertBanco): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+  await db.insert(bancos).values(banco).onDuplicateKeyUpdate({
+    set: { nome: banco.nome, taxaMensal: banco.taxaMensal, cor: banco.cor },
+  });
+}
+
+export async function inicializarBancos(): Promise<void> {
+  const db = await getDb();
+  if (!db) return;
+  const existing = await db.select().from(bancos).limit(1);
+  if (existing.length > 0) return;
+
+  const bancosIniciais: InsertBanco[] = [
+    { id: 'bv', nome: 'BV Financeira', taxaMensal: 114, cor: '#FF6B00' },
+    { id: 'santander', nome: 'Santander', taxaMensal: 129, cor: '#EC0000' },
+    { id: 'volkswagen', nome: 'Banco Volkswagen', taxaMensal: 152, cor: '#001E50' },
+    { id: 'bradesco', nome: 'Bradesco', taxaMensal: 155, cor: '#C41F3A' },
+    { id: 'bb', nome: 'Banco do Brasil', taxaMensal: 162, cor: '#FFD700' },
+    { id: 'itau', nome: 'Itaú', taxaMensal: 174, cor: '#EC7000' },
+    { id: 'caixa', nome: 'Caixa Econômica', taxaMensal: 180, cor: '#0066CC' },
+    { id: 'sicredi', nome: 'Sicredi', taxaMensal: 185, cor: '#009A44' },
+    { id: 'pan', nome: 'Banco Pan', taxaMensal: 210, cor: '#FF6B35' },
+    { id: 'omni', nome: 'Omni', taxaMensal: 290, cor: '#8B0000' },
+    { id: 'c6', nome: 'C6 Bank', taxaMensal: 138, cor: '#000000' },
+    { id: 'safra', nome: 'Banco Safra', taxaMensal: 145, cor: '#1B3A6B' },
+  ];
+
+  for (const banco of bancosIniciais) {
+    await db.insert(bancos).values(banco).onDuplicateKeyUpdate({ set: { nome: banco.nome } });
+  }
 }

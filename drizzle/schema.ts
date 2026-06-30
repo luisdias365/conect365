@@ -45,3 +45,15 @@ export const simulacoes = mysqlTable("simulacoes", {
 
 export type Simulacao = typeof simulacoes.$inferSelect;
 export type InsertSimulacao = typeof simulacoes.$inferInsert;
+export const bancos = mysqlTable("bancos", {
+  id: varchar("id", { length: 50 }).primaryKey(),
+  nome: varchar("nome", { length: 100 }).notNull(),
+  taxaMensal: int("taxaMensal").notNull(),
+  cor: varchar("cor", { length: 7 }).notNull().default('#000000'),
+  ativo: int("ativo").notNull().default(1),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Banco = typeof bancos.$inferSelect;
+export type InsertBanco = typeof bancos.$inferInsert;
